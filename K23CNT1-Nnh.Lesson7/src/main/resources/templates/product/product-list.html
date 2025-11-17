@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/boot
+strap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Product List</h2>
+    <!-- Nút thêm mới Product -->
+
+    <a th:href="@{/products/create}" class="btn btn-primary mb-
+3">Add New Product</a>
+
+    <!-- Kiểm tra nếu danh sách trống -->
+    <div th:if="${products.size() == 0}">
+        <p>No products available.</p>
+    </div>
+    <!-- Hiển thị danh sách Product -->
+    <table class="table table-bordered table-striped"
+           th:if="${products.size() > 0}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product Name</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+            <td th:text="${product.id}"></td>
+            <td th:text="${product.name}"></td>
+            <td><img th:src="${product.imageUrl}" alt="ProductImage" width="50"/></td>
+            <td th:text="${product.price}"></td>
+            <td th:text="${product.quantity}"></td>
+            <td th:text="${product.category.categoryName}"></td>
+            <td th:text="${product.status ? 'Available' : 'Outof Stock'}"></td>
+            <td>
+                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btnbtn-warning btn-sm">Edit</a>
+                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btnbtn-danger btn-sm"
+                        onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
