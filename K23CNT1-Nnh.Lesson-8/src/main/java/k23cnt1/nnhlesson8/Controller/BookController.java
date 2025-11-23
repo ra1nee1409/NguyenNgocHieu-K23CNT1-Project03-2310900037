@@ -27,8 +27,8 @@ public class BookController {
     @Autowired
     private AuthorService authorService;
 
-    // Thư mục lưu file ảnh (nên đặt ngoài src để chạy JAR)
-    private static final String UPLOAD_DIR = "uploads/images/";
+    // Sửa đường dẫn giống AuthorController
+    private static final String UPLOAD_DIR = "C:/Project 3/book_images/books/";
 
     // -------------------- Hiển thị danh sách sách --------------------
     @GetMapping
@@ -52,10 +52,8 @@ public class BookController {
             @RequestParam(required = false) List<Integer> authorIds,
             @RequestParam("imageBook") MultipartFile imageFile) {
 
-        // Thư mục lưu ảnh sách
-        Path uploadPath = Paths.get("D:/book_images/books/"); // <-- thêm /books
-
         try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -63,7 +61,10 @@ public class BookController {
             if (!imageFile.isEmpty()) {
                 String originalFilename = StringUtils.cleanPath(imageFile.getOriginalFilename());
                 String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                String newFileName = book.getCode() + fileExtension;
+
+                // Sử dụng code + timestamp để tránh trùng tên file (giống AuthorController)
+                String newFileName = book.getCode().replaceAll("\\s+", "_")
+                        + "_" + System.currentTimeMillis() + fileExtension;
 
                 Path filePath = uploadPath.resolve(newFileName);
 
@@ -74,9 +75,10 @@ public class BookController {
 
                 Files.copy(imageFile.getInputStream(), filePath);
 
-                // Lưu URL để hiển thị
-                book.setImgUrl("/uploads/images/" + newFileName);
+                // SỬA QUAN TRỌNG: Lưu URL để hiển thị - giống cấu trúc AuthorController
+                book.setImgUrl("/uploads/books/" + newFileName);
             } else if (book.getId() != null) {
+                // Edit mà không upload ảnh mới -> giữ ảnh cũ
                 Book existingBook = bookService.getBookById(book.getId());
                 book.setImgUrl(existingBook.getImgUrl());
             }
@@ -95,8 +97,6 @@ public class BookController {
         return "redirect:/books";
     }
 
-
-
     // -------------------- Form sửa sách --------------------
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model) {
@@ -109,6 +109,18 @@ public class BookController {
     // -------------------- Xóa sách --------------------
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable Integer id) {
+        // Xóa file ảnh trước khi xóa database (giống AuthorController)
+        Book book = bookService.getBookById(id);
+        if (book.getImgUrl() != null) {
+            String fileName = book.getImgUrl().substring(book.getImgUrl().lastIndexOf("/") + 1);
+            Path filePath = Paths.get(UPLOAD_DIR + fileName);
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         bookService.deleteBook(id);
         return "redirect:/books";
     }

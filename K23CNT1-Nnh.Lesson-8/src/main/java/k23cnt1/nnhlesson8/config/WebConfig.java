@@ -16,6 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
         // Ảnh Sách
         registry.addResourceHandler("/uploads/images/**")
                 .addResourceLocations("file:" + rootFolder + "books/");
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:///C:/Project 3/book_images/");
 
         // Ảnh Tác Giả
         registry.addResourceHandler("/uploads/authors/**")

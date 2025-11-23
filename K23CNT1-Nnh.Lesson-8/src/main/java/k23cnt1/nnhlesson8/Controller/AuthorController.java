@@ -21,7 +21,7 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
 
-    private static final String UPLOAD_DIR = "D:/book_images/authors/";
+    private static final String UPLOAD_DIR = "C:/Project 3/book_images/authors/";
 
 
     // -------------------- Danh sách authors --------------------
