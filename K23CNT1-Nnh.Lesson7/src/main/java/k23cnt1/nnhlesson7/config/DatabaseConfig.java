@@ -10,6 +10,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+
 @Configuration
 @EnableJpaRepositories(basePackages = "k23cnt1.nnhlesson7.repository")
 public class DatabaseConfig {
@@ -17,7 +18,7 @@ public class DatabaseConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/lesson06db?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/lesson07db?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh");
         dataSource.setUsername("root");
         dataSource.setPassword("14092005hH");
         return dataSource;
@@ -29,7 +30,6 @@ public class DatabaseConfig {
         em.setDataSource(dataSource);
         em.setPackagesToScan("k23cnt1.nnhlesson7.entity");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-
         Properties props = new Properties();
         props.setProperty("hibernate.hbm2ddl.auto", "update");
         props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
