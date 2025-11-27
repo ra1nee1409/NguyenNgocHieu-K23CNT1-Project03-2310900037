@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Ra1nee Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="register-card p-4">
+            <div class="text-center mb-4">
+                <h2><i class="bi bi-person-plus-fill text-primary"></i> Đăng ký tài khoản</h2>
+                <p class="text-muted">Tạo tài khoản mới để mua sắm tại Ra1nee Store</p>
+            </div>
+
+            <!-- Error message -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Registration form -->
+            <form th:action="@{/register}" method="post" th:object="${user}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-person"></i> Username <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="username" th:field="*{username}" required minlength="3"
+                        maxlength="50" placeholder="Nhập username">
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope"></i> Email <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" class="form-control" id="email" th:field="*{email}" required maxlength="100"
+                        placeholder="example@email.com">
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock"></i> Mật khẩu <span class="text-danger">*</span>
+                    </label>
+                    <input type="password" class="form-control" id="password" th:field="*{password}" required
+                        minlength="6" maxlength="255" placeholder="Ít nhất 6 ký tự">
+                    <small class="text-muted">Mật khẩu phải có ít nhất 6 ký tự</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">
+                        <i class="bi bi-card-text"></i> Họ và tên <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required
+                        maxlength="100" placeholder="Nguyễn Văn A">
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">
+                        <i class="bi bi-telephone"></i> Số điện thoại
+                    </label>
+                    <input type="tel" class="form-control" id="phone" th:field="*{phone}" maxlength="20"
+                        placeholder="0123456789">
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">
+                        <i class="bi bi-geo-alt"></i> Địa chỉ
+                    </label>
+                    <textarea class="form-control" id="address" th:field="*{address}" rows="2"
+                        placeholder="Nhập địa chỉ của bạn"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    <i class="bi bi-check-circle"></i> Đăng ký
+                </button>
+
+                <div class="text-center">
+                    <p class="mb-0">
+                        Đã có tài khoản?
+                        <a href="/login" class="text-decoration-none">Đăng nhập ngay</a>
+                    </p>
+                    <p class="mt-2">
+                        <a href="/home" class="text-decoration-none">
+                            <i class="bi bi-house"></i> Về trang chủ
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
