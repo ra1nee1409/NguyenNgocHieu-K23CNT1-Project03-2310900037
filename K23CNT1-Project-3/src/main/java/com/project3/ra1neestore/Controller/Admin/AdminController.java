@@ -6,6 +6,7 @@ import com.project3.ra1neestore.Repository.CategoryRepository;
 import com.project3.ra1neestore.Repository.ProductRepository;
 import com.project3.ra1neestore.Repository.UserRepository;
 import com.project3.ra1neestore.Service.ProductService;
+import com.project3.ra1neestore.Service.BannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,7 @@ public class AdminController {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final BannerService bannerService;
 
     // Thư mục gốc lưu ảnh (trong resources/static)
     private static final String UPLOAD_DIR = "src/main/resources/static/images/products/";
@@ -61,10 +63,14 @@ public class AdminController {
         long totalProducts = productRepository.count();
         long totalUsers = userRepository.count();
         long activeProducts = productRepository.findByIsActive(true).size();
+        long totalBanners = bannerService.getAllBanners().size();
+        long totalOrders = 0; // TODO: Implement when Order entity is ready
 
         model.addAttribute("totalProducts", totalProducts);
         model.addAttribute("totalUsers", totalUsers);
         model.addAttribute("activeProducts", activeProducts);
+        model.addAttribute("totalBanners", totalBanners);
+        model.addAttribute("totalOrders", totalOrders);
 
         return "admin/dashboard";
     }
@@ -92,7 +98,7 @@ public class AdminController {
     /**
      * Hiển thị form tạo sản phẩm mới
      */
-    @GetMapping("/products/new")
+    @GetMapping("/products/add")
     public String showCreateForm(Model model) {
         Product product = new Product();
         product.setIsActive(true);

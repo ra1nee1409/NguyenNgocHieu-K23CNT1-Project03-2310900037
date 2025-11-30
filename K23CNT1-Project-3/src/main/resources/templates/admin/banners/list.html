@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div th:replace="~{admin/fragments/admin-layout :: layout(~{::title}, ~{::content})}">
+        <title>Quản lý Banner</title>
+
+        <div th:fragment="content">
+            <!-- Header -->
+            <div class="content-header">
+                <h1>Quản lý Banner</h1>
+                <a href="/admin/banners/new" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Thêm Banner
+                </a>
+            </div>
+
+            <!-- Content Body -->
+            <div class="content-body">
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Banners Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th style="width: 120px;">Hình ảnh</th>
+                                        <th>Tên Slide</th>
+                                        <th style="width: 100px;">Thứ tự</th>
+                                        <th style="width: 120px;">Trạng thái</th>
+                                        <th style="width: 150px;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="banner : ${banners}">
+                                        <td th:text="${banner.id}">1</td>
+                                        <td>
+                                            <img th:if="${banner.imageUrl != null}" th:src="${banner.imageUrl}"
+                                                alt="Banner"
+                                                style="width: 100px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                            <span th:unless="${banner.imageUrl != null}" class="text-muted">
+                                                <i class="bi bi-image"></i> Không có ảnh
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${banner.name}">Banner Name</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${banner.displayOrder}">0</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${banner.isActive}" class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Kích hoạt
+                                            </span>
+                                            <span th:unless="${banner.isActive}" class="badge bg-secondary">
+                                                <i class="bi bi-x-circle"></i> Tắt
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/admin/banners/edit/{id}(id=${banner.id})}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i> Sửa
+                                            </a>
+                                            <form th:action="@{/admin/banners/delete/{id}(id=${banner.id})}"
+                                                method="post" style="display: inline;"
+                                                onsubmit="return confirm('Bạn có chắc muốn xóa banner này?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${banners.isEmpty()}">
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            <p class="mb-0">Chưa có banner nào</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

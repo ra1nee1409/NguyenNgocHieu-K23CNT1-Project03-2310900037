@@ -3,252 +3,135 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Khách hàng - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        body {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            padding: 0;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-menu {
-            padding: 1rem 0;
-        }
-
-        .sidebar-menu .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 0.75rem 1.5rem;
-            border-left: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: #ffc107;
-        }
-
-        .sidebar-menu .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-left-color: #ffc107;
-        }
-
-        .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-        }
-    </style>
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h4 class="mb-0">
-                <i class="bi bi-shield-check"></i> Admin Panel
-            </h4>
-            <small class="text-white-50">Ra1nee Store</small>
-        </div>
+    <div th:replace="~{admin/fragments/admin-layout :: layout(~{::title}, ~{::content})}">
+        <title>Quản lý Khách hàng</title>
 
-        <nav class="sidebar-menu">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/dashboard">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/products">
-                        <i class="bi bi-box-seam"></i> Quản lý Sản phẩm
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/admin/customers">
-                        <i class="bi bi-people"></i> Quản lý Khách hàng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-graph-up"></i> Báo cáo
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-gear"></i> Cài đặt
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="d-grid gap-2">
-                <a href="/home" class="btn btn-outline-light btn-sm">
-                    <i class="bi bi-house"></i> Về trang chủ
-                </a>
-                <form th:action="@{/logout}" method="post">
-                    <button type="submit" class="btn btn-warning btn-sm w-100">
-                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                    </button>
-                </form>
+        <div th:fragment="content">
+            <!-- Header -->
+            <div class="content-header">
+                <h1>Quản lý Khách hàng</h1>
             </div>
-        </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h1 class="mb-4">
-            <i class="bi bi-people"></i> Quản lý Khách hàng
-        </h1>
+            <!-- Content Body -->
+            <div class="content-body">
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
 
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card shadow-sm border-start border-primary border-4">
+                <!-- Search Bar -->
+                <div class="card mb-3">
                     <div class="card-body">
-                        <h6 class="text-muted text-uppercase mb-2">Tổng Users</h6>
-                        <h2 class="mb-0" th:text="${users.size()}">0</h2>
+                        <form action="/admin/customers" method="get" class="row g-3">
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                                        placeholder="Tìm kiếm theo tên đăng nhập hoặc email...">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Success/Error messages -->
-        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên đăng nhập</th>
+                                        <th>Email</th>
+                                        <th>Họ tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Vai trò</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}">
+                                        <td th:text="${user.id}">1</td>
+                                        <td>
+                                            <strong th:text="${user.username}">username</strong>
+                                        </td>
+                                        <td th:text="${user.email}">email@example.com</td>
+                                        <td th:text="${user.fullName}">Full Name</td>
+                                        <td th:text="${user.phone}">0123456789</td>
+                                        <td>
+                                            <span th:if="${user.role.name() == 'admin'}"
+                                                class="badge bg-warning text-dark">
+                                                <i class="bi bi-shield-check"></i> Admin
+                                            </span>
+                                            <span th:unless="${user.role.name() == 'admin'}" class="badge bg-info">
+                                                <i class="bi bi-person"></i> Khách hàng
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${user.status.name() == 'active'}" class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Hoạt động
+                                            </span>
+                                            <span th:if="${user.status.name() == 'inactive'}" class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Vô hiệu hóa
+                                            </span>
+                                            <span th:if="${user.status.name() == 'pending'}" class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> Chờ duyệt
+                                            </span>
+                                        </td>
+                                        <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy')}">01/01/2025</td>
+                                        <td>
+                                            <!-- Toggle Status -->
+                                            <form th:action="@{/admin/customers/{id}/toggle-status(id=${user.id})}"
+                                                method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm"
+                                                    th:classappend="${user.status.name() == 'active'} ? 'btn-outline-danger' : 'btn-outline-success'"
+                                                    th:title="${user.status.name() == 'active'} ? 'Vô hiệu hóa' : 'Kích hoạt'">
+                                                    <i
+                                                        th:class="${user.status.name() == 'active'} ? 'bi bi-lock' : 'bi bi-unlock'"></i>
+                                                </button>
+                                            </form>
 
-        <!-- Search Bar -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form action="/admin/customers" method="get" class="row g-3">
-                    <div class="col-md-10">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control" name="keyword" th:value="${keyword}"
-                                placeholder="Tìm kiếm khách hàng theo tên hoặc email...">
+                                            <!-- Delete (only for non-admin) -->
+                                            <form th:if="${user.role.name() != 'admin'}"
+                                                th:action="@{/admin/customers/{id}/delete(id=${user.id})}" method="post"
+                                                style="display: inline;"
+                                                onsubmit="return confirm('Bạn có chắc muốn xóa user này?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${users.isEmpty()}">
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            <p class="mb-0">Chưa có người dùng nào</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Users table -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0">Danh sách Users</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4">ID</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Họ tên</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Ngày tạo</th>
-                                <th class="text-end pe-4">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="user : ${users}">
-                                <td class="ps-4" th:text="${user.id}">1</td>
-                                <td>
-                                    <strong th:text="${user.username}">username</strong>
-                                </td>
-                                <td th:text="${user.email}">email</td>
-                                <td th:text="${user.fullName}">Full Name</td>
-                                <td>
-                                    <span class="badge"
-                                        th:classappend="${user.role.name() == 'admin'} ? 'bg-danger' : 'bg-info'"
-                                        th:text="${user.role.name() == 'admin'} ? 'ADMIN' : 'CUSTOMER'">
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge"
-                                        th:classappend="${user.status.name() == 'active'} ? 'bg-success' : 'bg-secondary'"
-                                        th:text="${user.status.name()}">
-                                    </span>
-                                </td>
-                                <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy')}">01/01/2025</td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group btn-group-sm">
-                                        <!-- Toggle Status -->
-                                        <form th:action="@{/admin/customers/{id}/toggle-status(id=${user.id})}"
-                                            method="post" style="display: inline;">
-                                            <button type="submit" class="btn btn-outline-secondary"
-                                                th:title="${user.status.name() == 'active'} ? 'Vô hiệu hóa' : 'Kích hoạt'">
-                                                <i
-                                                    th:class="${user.status.name() == 'active'} ? 'bi bi-lock' : 'bi bi-unlock'"></i>
-                                            </button>
-                                        </form>
-
-                                        <!-- Delete (only for non-admin) -->
-                                        <form th:if="${user.role.name() != 'admin'}"
-                                            th:action="@{/admin/customers/{id}/delete(id=${user.id})}" method="post"
-                                            style="display: inline;"
-                                            onsubmit="return confirm('Bạn có chắc muốn xóa user này?');">
-                                            <button type="submit" class="btn btn-outline-danger" title="Xóa">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${users.empty}">
-                                <td colspan="8" class="text-center py-4 text-muted">
-                                    <i class="bi bi-people fs-2 d-block mb-2"></i>
-                                    Không tìm thấy khách hàng nào
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

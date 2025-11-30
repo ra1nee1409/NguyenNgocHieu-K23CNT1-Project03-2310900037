@@ -3,6 +3,7 @@ package com.project3.ra1neestore.Controller.User;
 import com.project3.ra1neestore.Config.CustomUserDetails;
 import com.project3.ra1neestore.Repository.CategoryRepository;
 import com.project3.ra1neestore.Service.ProductService;
+import com.project3.ra1neestore.Service.BannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ public class HomeController {
 
     private final ProductService productService;
     private final CategoryRepository categoryRepository;
+    private final BannerService bannerService;
 
     /**
      * Hiển thị trang chủ với danh sách danh mục và sản phẩm.
@@ -59,6 +61,10 @@ public class HomeController {
         model.addAttribute("categories", categories);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("keyword", keyword);
+
+        // Lấy danh sách banners
+        var banners = bannerService.getActiveBanners();
+        model.addAttribute("banners", banners);
 
         // Lấy sản phẩm theo logic: Search -> Category -> All Active
         List<com.project3.ra1neestore.Entity.Product> products;

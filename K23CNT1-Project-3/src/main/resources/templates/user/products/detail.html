@@ -90,30 +90,13 @@
         <div class="container">
             <a class="navbar-brand" href="/home">
                 <i class="bi bi-shop"></i> Ra1nee Store
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/home">Trang chủ</a>
-                    </li>
-                    <!-- Auth Buttons -->
-                    <div class="d-flex ms-3 align-items-center">
-                        <div sec:authorize="isAuthenticated()" class="text-white me-3">
-                            Xin chào, <span sec:authentication="name" class="fw-bold">User</span>
-                        </div>
-                        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-outline-light btn-sm">Đăng xuất</button>
-                        </form>
-                        <a sec:authorize="!isAuthenticated()" href="/login"
-                            class="btn btn-outline-light btn-sm me-2">Đăng nhập</a>
-                        <a sec:authorize="!isAuthenticated()" href="/register"
-                            class="btn btn-light btn-sm text-primary fw-bold">Đăng ký</a>
-                    </div>
-                </ul>
-            </div>
+                <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-outline-light btn-sm me-2">Đăng
+                    nhập</a>
+                <a sec:authorize="!isAuthenticated()" href="/register"
+                    class="btn btn-light btn-sm text-primary fw-bold">Đăng ký</a>
+        </div>
+        </ul>
+        </div>
         </div>
     </nav>
 
