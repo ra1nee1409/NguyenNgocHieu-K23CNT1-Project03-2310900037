@@ -8,6 +8,7 @@ import com.project3.ra1neestore.Repository.UserRepository;
 import com.project3.ra1neestore.Service.ProductService;
 import com.project3.ra1neestore.Service.BannerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ import java.util.UUID;
  * Controller quản lý chung cho Admin (Dashboard + Products).
  * Đường dẫn gốc: /admin
  */
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -135,9 +137,9 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "Tạo sản phẩm thành công!");
             return "redirect:/admin/products";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error creating product: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
-            return "redirect:/admin/products/new";
+            return "redirect:/admin/products/add";
         }
     }
 
@@ -190,7 +192,7 @@ public class AdminController {
                         String imageUrl = uploadProductImage(imageFile, categoryName);
                         product.setImageUrl(imageUrl);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Error uploading product image: {}", e.getMessage(), e);
                     }
                 } else {
                     product.setImageUrl(oldProduct.getImageUrl());
@@ -201,7 +203,7 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
             return "redirect:/admin/products";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error updating product {}: {}", id, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/admin/products/edit/" + id;
         }

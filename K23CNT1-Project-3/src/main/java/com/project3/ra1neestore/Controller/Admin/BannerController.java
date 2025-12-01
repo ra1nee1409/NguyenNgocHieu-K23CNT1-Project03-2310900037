@@ -3,6 +3,7 @@ package com.project3.ra1neestore.Controller.Admin;
 import com.project3.ra1neestore.Entity.Banner;
 import com.project3.ra1neestore.Service.BannerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,7 @@ import java.util.UUID;
 /**
  * Controller quản lý Banner cho Admin
  */
+@Slf4j
 @Controller
 @RequestMapping("/admin/banners")
 @RequiredArgsConstructor
@@ -71,7 +73,7 @@ public class BannerController {
             redirectAttributes.addFlashAttribute("success", "Tạo banner thành công!");
             return "redirect:/admin/banners";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error creating banner: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/banners/new";
         }
@@ -116,7 +118,7 @@ public class BannerController {
                         String imageUrl = uploadBannerImage(imageFile);
                         banner.setImageUrl(imageUrl);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Error uploading banner image: {}", e.getMessage(), e);
                     }
                 } else {
                     banner.setImageUrl(oldBanner.getImageUrl());
@@ -127,7 +129,7 @@ public class BannerController {
             redirectAttributes.addFlashAttribute("success", "Cập nhật banner thành công!");
             return "redirect:/admin/banners";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error updating banner {}: {}", id, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/banners/edit/" + id;
         }
