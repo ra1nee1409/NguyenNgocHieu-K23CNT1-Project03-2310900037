@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div th:replace="~{user/fragments/user-layout :: layout(~{::title}, ~{::content})}">
+        <title>Thanh toán - Ra1nee Store</title>
+
+        <div th:fragment="content">
+            <style>
+                .checkout-container {
+                    max-width: 1200px;
+                    margin: 2rem auto;
+                }
+
+                .order-summary {
+                    position: sticky;
+                    top: 20px;
+                }
+            </style>
+
+            <div class="checkout-container">
+                <h2 class="mb-4"><i class="bi bi-credit-card"></i> Thanh toán</h2>
+
+                <!-- Error Messages -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="row">
+                    <!-- Shipping Information Form -->
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-truck"></i> Thông tin giao hàng</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/orders/create}" method="post" id="checkoutForm">
+                                    <div class="mb-3">
+                                        <label for="customerName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="customerName" name="customerName" 
+                                               th:value="${user.fullName}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="customerPhone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="customerPhone" name="customerPhone" 
+                                               th:value="${user.phone}" required pattern="[0-9]{10,11}">
+                                        <div class="form-text">Nhập số điện thoại 10-11 số</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="customerAddress" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="customerAddress" name="customerAddress" 
+                                                  rows="3" required th:text="${user.address}"></textarea>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> Vui lòng kiểm tra kỹ thông tin trước khi đặt hàng
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm order-summary">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="bi bi-receipt"></i> Đơn hàng của bạn</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Cart Items -->
+                                <div class="mb-3" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" 
+                                         th:each="item : ${cartItems}">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold" th:text="${item.product.name}">Product Name</div>
+                                            <small class="text-muted">
+                                                <span th:text="${#numbers.formatDecimal(item.product.salePrice != null ? item.product.salePrice : item.product.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                                x <span th:text="${item.quantity}">1</span>
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <strong th:text="${#numbers.formatDecimal((item.product.salePrice != null ? item.product.salePrice : item.product.price) * item.quantity, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- Total -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tạm tính:</span>
+                                    <strong th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Phí vận chuyển:</span>
+                                    <span class="text-success">Miễn phí</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <strong class="fs-5">Tổng cộng:</strong>
+                                    <strong class="text-danger fs-4" 
+                                            th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" form="checkoutForm" class="btn btn-success btn-lg">
+                                        <i class="bi bi-check-circle"></i> Xác nhận đặt hàng
+                                    </button>
+                                    <a href="/cart" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Quay lại giỏ hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

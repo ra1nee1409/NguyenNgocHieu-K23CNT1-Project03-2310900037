@@ -30,6 +30,42 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
+                <!-- Search & Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="/admin/products" method="get" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="keyword" class="form-label">Tìm kiếm</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="keyword" name="keyword" 
+                                           th:value="${keyword}" placeholder="Tên sản phẩm...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="categoryId" class="form-label">Danh mục</label>
+                                <select class="form-select" id="categoryId" name="categoryId">
+                                    <option value="">-- Tất cả danh mục --</option>
+                                    <option th:each="cat : ${categories}" 
+                                            th:value="${cat.id}" 
+                                            th:text="${cat.name}"
+                                            th:selected="${cat.id == categoryId}">Category Name</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-funnel"></i> Lọc
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <a href="/admin/products" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- Products Table -->
                 <div class="card">
                     <div class="card-body">

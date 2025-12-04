@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div th:replace="~{admin/fragments/admin-layout :: layout(~{::title}, ~{::content})}">
+        <title>Quản lý đơn hàng</title>
+
+        <div th:fragment="content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-receipt"></i> Quản lý đơn hàng</h2>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Filter and Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" th:action="@{/admin/orders}" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="statusFilter" class="form-label">Lọc theo trạng thái</label>
+                            <select class="form-select" id="statusFilter" name="status">
+                                <option value="ALL" th:selected="${selectedStatus == 'ALL'}">Tất cả</option>
+                                <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Đặt hàng</option>
+                                <option value="CONFIRMED" th:selected="${selectedStatus == 'CONFIRMED'}">Đã xác nhận</option>
+                                <option value="SHIPPING" th:selected="${selectedStatus == 'SHIPPING'}">Đang giao</option>
+                                <option value="DELIVERED" th:selected="${selectedStatus == 'DELIVERED'}">Đã tới điểm giao</option>
+                                <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">Hoàn thành</option>
+                                <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="searchInput" class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="searchInput" name="search" 
+                                   th:value="${searchQuery}" placeholder="Mã đơn hàng hoặc tên khách hàng...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Mã ĐH</th>
+                                    <th>Khách hàng</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${orders.isEmpty()}">
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        Không có đơn hàng nào
+                                    </td>
+                                </tr>
+                                <tr th:each="order : ${orders}">
+                                    <td><strong>#<span th:text="${order.id}">1</span></strong></td>
+                                    <td th:text="${order.customerName}">Nguyễn Văn A</td>
+                                    <td th:text="${order.customerPhone}">0123456789</td>
+                                    <td>
+                                        <strong class="text-danger" 
+                                                th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                                            1,000,000₫
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 
+                                                              (${order.status.name() == 'CONFIRMED'} ? 'bg-info' : 
+                                                              (${order.status.name() == 'SHIPPING'} ? 'bg-primary' : 
+                                                              (${order.status.name() == 'DELIVERED'} ? 'bg-success' : 
+                                                              (${order.status.name() == 'COMPLETED'} ? 'bg-dark' : 'bg-danger'))))">
+                                            <span th:if="${order.status.name() == 'PENDING'}">Đặt hàng</span>
+                                            <span th:if="${order.status.name() == 'CONFIRMED'}">Đã xác nhận</span>
+                                            <span th:if="${order.status.name() == 'SHIPPING'}">Đang giao</span>
+                                            <span th:if="${order.status.name() == 'DELIVERED'}">Đã tới điểm giao</span>
+                                            <span th:if="${order.status.name() == 'COMPLETED'}">Hoàn thành</span>
+                                            <span th:if="${order.status.name() == 'CANCELLED'}">Đã hủy</span>
+                                        </span>
+                                    </td>
+                                    <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</td>
+                                    <td>
+                                        <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

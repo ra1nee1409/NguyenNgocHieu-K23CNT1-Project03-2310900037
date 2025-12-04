@@ -44,11 +44,21 @@
                                                 class="text-danger">*</span>
                                         </label>
                                         <input type="file" class="form-control" id="imageFile" name="imageFile"
-                                            accept="image/*" th:required="${banner.id == null}">
+                                            accept="image/*" th:required="${banner.id == null}"
+                                            onchange="previewImage(event)">
                                         <div class="form-text">Kích thước đề xuất: 1920x600px</div>
 
+                                        <!-- Preview NEW image -->
+                                        <div id="imagePreview" class="mt-3" style="display: none;">
+                                            <label class="form-label">Ảnh mới:</label>
+                                            <div>
+                                                <img id="preview" src="#" alt="Preview"
+                                                    style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #dee2e6;">
+                                            </div>
+                                        </div>
+
                                         <!-- Preview current image -->
-                                        <div th:if="${banner.imageUrl != null}" class="mt-3">
+                                        <div th:if="${banner.imageUrl != null}" class="mt-3" id="currentImage">
                                             <label class="form-label">Ảnh hiện tại:</label>
                                             <div>
                                                 <img th:src="${banner.imageUrl}" alt="Current banner"
@@ -94,6 +104,26 @@
                     </div>
                 </div>
             </div>
+            
+            <script>
+                function previewImage(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            document.getElementById('preview').src = e.target.result;
+                            document.getElementById('imagePreview').style.display = 'block';
+                            
+                            // Hide current image when new image is selected
+                            const currentImage = document.getElementById('currentImage');
+                            if (currentImage) {
+                                currentImage.style.display = 'none';
+                            }
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+            </script>
         </div>
     </div>
 </body>

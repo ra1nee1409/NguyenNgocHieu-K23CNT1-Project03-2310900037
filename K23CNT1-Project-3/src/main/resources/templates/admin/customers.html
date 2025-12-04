@@ -96,6 +96,13 @@
                                         </td>
                                         <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy')}">01/01/2025</td>
                                         <td>
+                                            <!-- View Details -->
+                                            <a th:href="@{/admin/customers/{id}/detail(id=${user.id})}"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Xem chi tiết">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
                                             <!-- Toggle Status -->
                                             <form th:action="@{/admin/customers/{id}/toggle-status(id=${user.id})}"
                                                 method="post" style="display: inline;">

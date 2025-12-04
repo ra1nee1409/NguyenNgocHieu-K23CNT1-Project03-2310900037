@@ -12,11 +12,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.project3.ra1neestore</groupId>
+    <groupId>com.nnh.ra1neestore</groupId>
     <artifactId>K23CNT1-Project-3</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>K23CNT1-Project-3</name>
-    <description>Project 3 - Phát triển hệ thống thương mại điện tử bán linh kiện và thiết bị công nghệ</description>
+    <description>Project 3 - Xây dựng website bán máy tính và linh kiện PC</description>
 
     <properties>
         <java.version>21</java.version>

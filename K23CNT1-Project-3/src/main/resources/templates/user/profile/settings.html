@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>
+<div th:replace="~{user/fragments/user-layout :: layout(~{::title}, ~{::content})}">
+    <title>Cài đặt tài khoản</title>
+    <div th:fragment="content">
+        <div class="container my-4" style="max-width:900px">
+            <h2 class="mb-4"><i class="bi bi-gear-fill"></i> Cài đặt tài khoản</h2>
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-person-circle"></i> Thông tin cá nhân</h5></div>
+                <div class="card-body">
+                    <form th:action="@{/user/profile/update}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" name="fullName" class="form-control" th:value="${user.fullName}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" th:value="${user.email}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" name="phone" class="form-control" th:value="${user.phone}" pattern="[0-9]{10,11}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" name="birthDate" class="form-control" th:value="${user.birthDate}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ</label>
+                                <textarea name="address" class="form-control" rows="2" th:text="${user.address}"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> Lưu thay đổi</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning"><h5 class="mb-0"><i class="bi bi-key-fill"></i> Đổi mật khẩu</h5></div>
+                <div class="card-body">
+                    <form th:action="@{/user/profile/change-password}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu hiện tại</label>
+                            <input type="password" name="currentPassword" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu mới</label>
+                            <input type="password" name="newPassword" class="form-control" minlength="6" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xác nhận mật khẩu mới</label>
+                            <input type="password" name="confirmPassword" class="form-control" minlength="6" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning"><i class="bi bi-shield-lock"></i> Đổi mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

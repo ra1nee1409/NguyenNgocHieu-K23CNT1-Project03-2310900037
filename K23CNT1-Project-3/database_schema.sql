@@ -184,3 +184,70 @@ INSERT INTO cart (user_id, product_id, quantity) VALUES
 (4, 3, 2),
 (4, 5, 1),
 (5, 1, 1);
+
+
+
+-- Bảng giỏ hàng (cart)
+CREATE TABLE IF NOT EXISTS cart (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_product (user_id, product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng đơn hàng (orders)
+CREATE TABLE IF NOT EXISTS orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    customer_name VARCHAR(100),
+    customer_phone VARCHAR(20),
+    customer_address TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Bảng chi tiết đơn hàng (order_items)
+CREATE TABLE IF NOT EXISTS order_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tạo index để tăng tốc truy vấn
+CREATE INDEX idx_cart_user ON cart(user_id);
+CREATE INDEX idx_cart_product ON cart(product_id);
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX idx_order_items_order ON order_items(order_id);
+CREATE INDEX idx_order_items_product ON order_items(product_id);
+
+-- Kiểm tra cấu trúc bảng orders
+DESCRIBE orders;
+
+-- Mở rộng độ dài cột status
+ALTER TABLE orders MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'PENDING';
+
+-- Sau đó chạy lại các lệnh UPDATE
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE orders SET status = 'PENDING' WHERE LOWER(status) = 'pending';
+UPDATE orders SET status = 'CONFIRMED' WHERE LOWER(status) = 'confirmed';
+UPDATE orders SET status = 'SHIPPING' WHERE LOWER(status) = 'shipping' OR LOWER(status) = 'shipped';
+UPDATE orders SET status = 'DELIVERED' WHERE LOWER(status) = 'delivered';
+UPDATE orders SET status = 'COMPLETED' WHERE LOWER(status) = 'completed';
+UPDATE orders SET status = 'CANCELLED' WHERE LOWER(status) = 'cancelled';
+
+SET SQL_SAFE_UPDATES = 1;
+
+-- Verify
+SELECT id, status, created_at FROM orders ORDER BY created_at DESC;
