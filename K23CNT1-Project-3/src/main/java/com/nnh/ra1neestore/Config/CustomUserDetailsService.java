@@ -1,7 +1,7 @@
 package com.nnh.ra1neestore.Config;
 
-import com.nnh.ra1neestore.Entity.User;
-import com.nnh.ra1neestore.Repository.UserRepository;
+import com.nnh.ra1neestore.Entity.NnhUser;
+import com.nnh.ra1neestore.Repository.NnhUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,20 +9,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Custom UserDetailsService để load user từ database
+ * Custom UserDetailsService để load nnhUser từ database
  */
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final NnhUserRepository nnhUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        NnhUser nnhUser = nnhUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "Không tìm thấy user với username: " + username));
+                        "Không tìm thấy nnhUser với username: " + username));
 
-        return new CustomUserDetails(user);
+        return new CustomUserDetails(nnhUser);
     }
 }

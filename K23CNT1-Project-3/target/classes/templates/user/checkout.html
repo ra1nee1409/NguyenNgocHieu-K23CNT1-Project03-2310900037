@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - RA1NEE STORE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-blue-600 mb-4">RA1NEE STORE</h1>
+            <div class="flex items-center text-sm text-gray-600">
+                <a href="/cart" class="hover:text-blue-600">Giỏ hàng</a>
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <span>Thông tin</span>
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <span>Vận chuyển</span>
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <span class="text-blue-600 font-semibold">Thanh toán</span>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Form -->
+            <div>
+                <h2 class="text-xl font-bold mb-6">Thông tin nhận hàng</h2>
+                
+                <form th:action="@{/checkout}" method="post">
+                    <div class="space-y-4">
+                        <!-- Email -->
+                        <div>
+                            <input type="email" name="customerEmail" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Email">
+                        </div>
+                        
+                        <!-- Full Name -->
+                        <div>
+                            <input type="text" name="customerName" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Họ và tên">
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div>
+                            <input type="tel" name="customerPhone" required pattern="[0-9]{10,11}"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Số điện thoại (10-11 số)">
+                        </div>
+                        
+                        <!-- Address -->
+                        <div>
+                            <input type="text" name="customerAddress" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Địa chỉ">
+                        </div>
+                        
+                        <!-- Note -->
+                        <div>
+                            <textarea name="note" rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Ghi chú (tùy chọn)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="mt-6 flex items-center justify-between">
+                        <a href="/cart" class="text-blue-600 hover:text-blue-700">
+                            <i class="fas fa-chevron-left mr-2"></i>Giỏ hàng
+                        </a>
+                        <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                            Tiếp tục chọn phương thức vận chuyển
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Footer Note -->
+                <div class="mt-8 text-sm text-gray-600 text-center">
+                    Cảm ơn bạn đã mua hàng tại RA1NEE STORE. Nếu có vấn đề gì thắc mắc cứ liên hệ Page để được hỗ trợ nhé! RA1NEE STORE xin cảm ơn!
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div>
+                <div class="bg-gray-50 rounded-lg p-6 sticky top-4">
+                    <h2 class="text-xl font-bold mb-4">Đơn hàng (<span th:text="${#lists.size(cartItems)}"></span> sản phẩm)</h2>
+                    
+                    <!-- Cart Items -->
+                    <div class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                        <div th:each="item : ${cartItems}" class="flex gap-3">
+                            <div class="relative">
+                                <img th:src="@{${item.nnhProduct.imageUrl}}" 
+                                     th:alt="${item.nnhProduct.name}"
+                                     class="w-16 h-16 object-cover rounded border">
+                                <span class="absolute top-0 right-0 bg-gray-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                                      th:text="${item.quantity}"></span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm" th:text="${item.nnhProduct.name}"></p>
+                                <p class="text-xs text-gray-600">Còn</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold" th:text="${#numbers.formatDecimal(item.nnhProduct.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + 'đ'"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Tạm tính</span>
+                            <span th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Phí vận chuyển</span>
+                            <span>-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="flex justify-between items-center border-t pt-4 mt-4">
+                        <span class="text-lg font-semibold">Tổng cộng</span>
+                        <span class="text-2xl font-bold text-blue-600" th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

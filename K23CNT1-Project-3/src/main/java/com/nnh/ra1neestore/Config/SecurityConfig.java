@@ -55,17 +55,16 @@ public class SecurityConfig {
                 // Configure authorization
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - accessible without login
-                        .requestMatchers("/", "/home", "/register", "/login",
-                                "/css/**", "/js/**", "/images/**",
-                                "/products/**") // Cho phép xem danh sách và chi tiết sản phẩm
+                        .requestMatchers("/", "/home", "/register", "/login", "/forgot-password", "/reset-password",
+                                "/css/**", "/js/**", "/images/**", "/nnhProducts/**", "/product/**")
                         .permitAll()
-
                         // Admin endpoints - chỉ ADMIN
-                        // Bao gồm /admin/dashboard, /admin/products, ...
+                        // Bao gồm /admin/dashboard, /admin/nnhProducts, ...
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // User endpoints - authenticated users
-                        .requestMatchers("/cart/**", "/orders/**", "/user/**").authenticated()
+                        .requestMatchers("/cart/**", "/checkout/**", "/order-success/**", "/orders/**", "/nnhUser/**")
+                        .authenticated()
 
                         // Authenticated users only
                         .anyRequest().authenticated())

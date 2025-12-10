@@ -1,6 +1,6 @@
 package com.nnh.ra1neestore.Config;
 
-import com.nnh.ra1neestore.Entity.User;
+import com.nnh.ra1neestore.Entity.NnhUser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,31 +11,31 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Custom UserDetails implementation để wrap User entity
+ * Custom UserDetails implementation để wrap NnhUser entity
  */
 @Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    private final NnhUser nnhUser;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convert user role to Spring Security GrantedAuthority
-        // Database có 'admin' và 'customer', cần convert sang 'ROLE_ADMIN' và
+        // Convert nnhUser role to Spring Security GrantedAuthority
+        // Database có 'ADMIN' và 'CUSTOMER', cần convert sang 'ROLE_ADMIN' và
         // 'ROLE_CUSTOMER'
-        String roleName = "ROLE_" + user.getRole().name().toUpperCase();
+        String roleName = "ROLE_" + nnhUser.getRole().name().toUpperCase();
         return Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return nnhUser.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return nnhUser.getUsername();
     }
 
     @Override
@@ -62,13 +62,20 @@ public class CustomUserDetails implements UserDetails {
      * Helper method để lấy full name
      */
     public String getFullName() {
-        return user.getFullName();
+        return nnhUser.getFullName();
     }
 
     /**
      * Helper method để lấy role
      */
-    public User.UserRole getRole() {
-        return user.getRole();
+    public NnhUser.UserRole getRole() {
+        return nnhUser.getRole();
+    }
+
+    /**
+     * Helper method để lấy user ID
+     */
+    public Long getUserId() {
+        return nnhUser.getId();
     }
 }
