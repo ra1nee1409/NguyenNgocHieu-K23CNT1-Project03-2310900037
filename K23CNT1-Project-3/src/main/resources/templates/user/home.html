@@ -7,6 +7,28 @@
     <!-- Navbar -->
     <nav th:replace="~{user/fragments/user-layout :: navbar}"></nav>
 
+    <!-- Toast Notification - Success -->
+    <div th:if="${successMessage}" 
+         id="toast" 
+         class="fixed top-20 right-4 z-50 max-w-md bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
+        <i class="fas fa-check-circle text-2xl"></i>
+        <span class="flex-1 font-medium" th:text="${successMessage}"></span>
+        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- Toast Notification - Error -->
+    <div th:if="${errorMessage}" 
+         id="toast" 
+         class="fixed top-20 right-4 z-50 max-w-md bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
+        <i class="fas fa-exclamation-circle text-2xl"></i>
+        <span class="flex-1 font-medium" th:text="${errorMessage}"></span>
+        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
         
@@ -179,12 +201,14 @@
                                 </span>
                             </div>
                             
-                            <!-- Add to Cart Link -->
-                            <a th:if="${product.stockQuantity > 0}" 
-                               th:href="@{/product/{id}(id=${product.id})}"
-                               class="w-10 h-10 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-all shadow-lg hover:shadow-xl">
-                                <i class="fas fa-plus text-lg"></i>
-                            </a>
+                            <!-- Add to Cart Form -->
+                            <form th:if="${product.stockQuantity > 0}" th:action="@{/cart/add}" method="post">
+                                <input type="hidden" name="productId" th:value="${product.id}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="w-10 h-10 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-all shadow-lg hover:shadow-xl">
+                                    <i class="fas fa-plus text-lg"></i>
+                                </button>
+                            </form>
                             <div th:unless="${product.stockQuantity > 0}" 
                                  class="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center opacity-50 pointer-events-none">
                                 <i class="fas fa-plus text-lg"></i>
@@ -245,7 +269,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
     
+    <!-- Toast Animation CSS -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+    
     <script>
+        // Toast Notification
+        function closeToast() {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(400px)';
+                setTimeout(() => toast.remove(), 300);
+            }
+        }
+        
+        // Auto-hide toast after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                setTimeout(() => closeToast(), 5000);
+            }
+        });
+        
         // Banner Carousel
         let currentBanner = 0;
         const banners = document.querySelectorAll('.banner-slide');

@@ -20,9 +20,12 @@ public class NnhCartService {
     private final NnhProductRepository productRepository;
 
     @Transactional
-    public void addToCart(Long userId, Long productId, Integer quantity) {
+    public String addToCart(Long userId, Long productId, Integer quantity) {
         // Check if product already in cart
         var existingCart = cartRepository.findByNnhUserIdAndNnhProductId(userId, productId);
+
+        NnhProduct product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (existingCart.isPresent()) {
             // Update quantity
@@ -31,9 +34,6 @@ public class NnhCartService {
             cartRepository.save(cart);
         } else {
             // Create new cart item
-            NnhProduct product = productRepository.findById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-
             NnhUser user = new NnhUser();
             user.setId(userId);
 
@@ -45,6 +45,8 @@ public class NnhCartService {
 
             cartRepository.save(cart);
         }
+
+        return product.getName();
     }
 
     public List<NnhCart> getCartItems(Long userId) {

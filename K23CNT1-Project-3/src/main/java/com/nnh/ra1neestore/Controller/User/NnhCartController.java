@@ -36,19 +36,26 @@ public class NnhCartController {
     public String addToCart(@RequestParam Long productId,
             @RequestParam(defaultValue = "1") Integer quantity,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestHeader(value = "Referer", required = false) String referer,
             RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
             return "redirect:/login";
         }
 
         try {
-            cartService.addToCart(userDetails.getUserId(), productId, quantity);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã thêm vào giỏ hàng!");
+            String productName = cartService.addToCart(userDetails.getUserId(), productId, quantity);
+            String message = "Đã thêm " + (quantity > 1 ? quantity + " sản phẩm " : "") + "\"" + productName
+                    + "\" vào giỏ hàng!";
+            redirectAttributes.addFlashAttribute("successMessage", message);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
-        return "redirect:/product/" + productId;
+        // Redirect back to the referring page, or home if no referer
+        if (referer != null && !referer.isEmpty()) {
+            return "redirect:" + referer.substring(referer.indexOf("/", referer.indexOf("://") + 3));
+        }
+        return "redirect:/home";
     }
 
     @PostMapping("/update/{id}")

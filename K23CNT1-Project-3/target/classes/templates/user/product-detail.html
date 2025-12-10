@@ -7,6 +7,28 @@
     <!-- Navbar -->
     <nav th:replace="~{user/fragments/user-layout :: navbar}"></nav>
 
+    <!-- Toast Notification - Success -->
+    <div th:if="${successMessage}" 
+         id="toast" 
+         class="fixed top-20 right-4 z-50 max-w-md bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
+        <i class="fas fa-check-circle text-2xl"></i>
+        <span class="flex-1 font-medium" th:text="${successMessage}"></span>
+        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- Toast Notification - Error -->
+    <div th:if="${errorMessage}" 
+         id="toast" 
+         class="fixed top-20 right-4 z-50 max-w-md bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
+        <i class="fas fa-exclamation-circle text-2xl"></i>
+        <span class="flex-1 font-medium" th:text="${errorMessage}"></span>
+        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Breadcrumb -->
@@ -67,7 +89,7 @@
                 </div>
 
                 <!-- Add to Cart Form -->
-                <form th:action="@{/nnhCart/add}" method="post" class="mb-6">
+                <form th:action="@{/cart/add}" method="post" class="mb-6">
                     <input type="hidden" name="productId" th:value="${product.id}">
                     
                     <!-- Quantity Selector -->
@@ -349,7 +371,42 @@
             });
             ratingText.textContent = '';
         }
+        
+        // Toast Notification Functions
+        function closeToast() {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(400px)';
+                setTimeout(() => toast.remove(), 300);
+            }
+        }
+        
+        // Auto-hide toast after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                setTimeout(() => closeToast(), 5000);
+            }
+        });
     </script>
+    
+    <!-- Toast Animation CSS -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
 </body>
 
 </html>
