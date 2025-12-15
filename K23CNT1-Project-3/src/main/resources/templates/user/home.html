@@ -7,24 +7,11 @@
     <!-- Navbar -->
     <nav th:replace="~{user/fragments/user-layout :: navbar}"></nav>
 
-    <!-- Toast Notification - Success -->
-    <div th:if="${successMessage}" 
-         id="toast" 
-         class="fixed top-20 right-4 z-50 max-w-md bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-4 z-50 max-w-md bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl items-center gap-3 hidden">
         <i class="fas fa-check-circle text-2xl"></i>
-        <span class="flex-1 font-medium" th:text="${successMessage}"></span>
-        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
-            <i class="fas fa-times text-xl"></i>
-        </button>
-    </div>
-    
-    <!-- Toast Notification - Error -->
-    <div th:if="${errorMessage}" 
-         id="toast" 
-         class="fixed top-20 right-4 z-50 max-w-md bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-slide-in">
-        <i class="fas fa-exclamation-circle text-2xl"></i>
-        <span class="flex-1 font-medium" th:text="${errorMessage}"></span>
-        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors">
+        <span id="toastMessage" class="flex-1 font-medium"></span>
+        <button onclick="closeToast()" class="text-white hover:text-gray-200 transition-colors ml-3">
             <i class="fas fa-times text-xl"></i>
         </button>
     </div>
@@ -41,9 +28,12 @@
                      th:class="${iterStat.index == 0} ? 
                                'absolute inset-0 transition-opacity duration-1000 banner-slide opacity-100 z-10' : 
                                'absolute inset-0 transition-opacity duration-1000 banner-slide opacity-0 z-0'">
-                    <img th:src="${banner.imageUrl}" 
+                    <img th:if="${banner.imageUrl != null}" 
+                         th:src="${banner.imageUrl}" 
                          th:alt="${banner.name}"
-                         class="w-full h-full object-contain">
+                         class="w-full h-full object-contain"
+                         th:attr="loading=${iterStat.index == 0 ? 'eager' : 'lazy'}, fetchpriority=${iterStat.index == 0 ? 'high' : 'auto'}"
+                         decoding="async">
                     <!-- Gradient overlay -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                 </div>
@@ -156,6 +146,8 @@
                         <img th:if="${product.imageUrl != null}" 
                              th:src="${product.imageUrl}" 
                              th:alt="${product.name}"
+                             loading="lazy"
+                             decoding="async"
                              class="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300" />
                         <div th:unless="${product.imageUrl != null}" 
                              class="w-full h-full flex items-center justify-center">
@@ -181,35 +173,45 @@
                         <div class="mb-3">
                             <div th:if="${product.salePrice != null}">
                                 <span class="text-sm text-gray-400 line-through" 
+                                      th:if="${product.price != null}"
                                       th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
                                 <div class="text-xl font-bold text-red-600" 
                                      th:text="${#numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></div>
                             </div>
-                            <div th:if="${product.salePrice == null}" 
-                                 class="text-xl font-bold text-gray-900"
-                                 th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></div>
+                            <div th:if="${product.salePrice == null}">
+                                 <div class="text-xl font-bold text-gray-900"
+                                      th:if="${product.price != null}"
+                                      th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></div>
+                                 <div class="text-xl font-bold text-gray-900"
+                                      th:unless="${product.price != null}">Liên hệ</div>
+                            </div>
                         </div>
                         
                         <!-- Stock & Add to Cart Button -->
                         <div class="mt-auto flex items-center justify-between">
                             <div>
-                                <span th:if="${product.stockQuantity > 0}" class="text-sm text-green-600">
+                                <span th:if="${product.stockQuantity != null and product.stockQuantity > 0}" class="text-sm text-green-600">
                                     <i class="fas fa-check-circle"></i> Còn hàng
                                 </span>
-                                <span th:unless="${product.stockQuantity > 0}" class="text-sm text-red-600">
+                                <span th:unless="${product.stockQuantity != null and product.stockQuantity > 0}" class="text-sm text-red-600">
                                     <i class="fas fa-times-circle"></i> Hết hàng
                                 </span>
                             </div>
                             
                             <!-- Add to Cart Form -->
-                            <form th:if="${product.stockQuantity > 0}" th:action="@{/cart/add}" method="post">
+                            <form th:if="${product.stockQuantity != null and product.stockQuantity > 0}" 
+                                  th:action="@{/cart/add}" 
+                                  method="post"
+                                  class="add-to-cart-form"
+                                  th:data-product-name="${product.name}">
                                 <input type="hidden" name="productId" th:value="${product.id}">
                                 <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                                 <button type="submit" class="w-10 h-10 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-all shadow-lg hover:shadow-xl">
                                     <i class="fas fa-plus text-lg"></i>
                                 </button>
                             </form>
-                            <div th:unless="${product.stockQuantity > 0}" 
+                            <div th:if="${product.stockQuantity == null or product.stockQuantity <= 0}" 
                                  class="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center opacity-50 pointer-events-none">
                                 <i class="fas fa-plus text-lg"></i>
                             </div>
@@ -269,40 +271,55 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
     
-    <!-- Toast Animation CSS -->
-    <style>
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-    </style>
-    
     <script>
-        // Toast Notification
-        function closeToast() {
+        // Toast Notification Functions
+        function showToast(message) {
             const toast = document.getElementById('toast');
-            if (toast) {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(400px)';
-                setTimeout(() => toast.remove(), 300);
-            }
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            
+            // Auto-hide after 7 seconds
+            setTimeout(() => closeToast(), 7000);
         }
         
-        // Auto-hide toast after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
+        function closeToast() {
             const toast = document.getElementById('toast');
-            if (toast) {
-                setTimeout(() => closeToast(), 5000);
-            }
+            toast.classList.add('hidden');
+            toast.classList.remove('flex');
+        }
+        
+        // Add to Cart AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.add-to-cart-form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const productName = this.dataset.productName;
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            showToast(`Đã thêm "${productName}" vào giỏ hàng!`);
+                            // Reload after toast is shown (8 seconds to allow user to see it)
+                            setTimeout(() => location.reload(), 8000);
+                        } else {
+                            showToast('Có lỗi xảy ra, vui lòng thử lại!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Có lỗi xảy ra, vui lòng thử lại!');
+                    });
+                });
+            });
         });
         
         // Banner Carousel

@@ -43,7 +43,11 @@ public class NnhHomeController {
             @RequestParam(required = false) java.math.BigDecimal minPrice,
             @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
+            jakarta.servlet.http.HttpServletRequest request,
             Model model) {
+
+        // Force session creation to ensure CSRF token works correctly
+        request.getSession(true);
 
         // Lấy danh sách categories
         var categories = nnhCategoryRepository.findAll();

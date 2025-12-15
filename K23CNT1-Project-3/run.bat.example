@@ -1,0 +1,26 @@
+@echo off
+REM ========================================
+REM RA1NEE STORE - Development Server Launcher
+REM ========================================
+REM INSTRUCTIONS:
+REM 1. Copy this file to "run.bat"
+REM 2. Replace the placeholder values with your actual credentials
+REM 3. Run "run.bat" to start the server
+REM ========================================
+
+echo Starting RA1NEE STORE server...
+echo.
+
+REM Set environment variables
+REM Replace these with your actual values:
+set DB_PASSWORD=your_database_password_here
+set MAIL_USERNAME=your_email@gmail.com
+set MAIL_PASSWORD=your_gmail_app_password_here
+
+REM Start Spring Boot
+echo Loading environment variables...
+echo Starting Maven Spring Boot...
+echo.
+mvn spring-boot:run
+
+pause
