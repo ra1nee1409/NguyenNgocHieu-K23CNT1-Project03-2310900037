@@ -76,7 +76,7 @@ public class NnhAdminController {
             @RequestParam(defaultValue = "0") int page,
             Model model) {
 
-        var products = nnhProductService.searchProducts(keyword, categoryId);
+        var products = nnhProductService.searchAllProducts(keyword, categoryId);
         var categories = nnhCategoryRepository.findAll();
 
         // Pagination logic

@@ -3,6 +3,7 @@ package com.nnh.ra1neestore.Controller;
 import com.nnh.ra1neestore.Service.EmailService;
 import com.nnh.ra1neestore.Service.NnhUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class NnhPasswordResetController {
 
     private final NnhUserService nnhUserService;
@@ -48,20 +50,19 @@ public class NnhPasswordResetController {
 
     @GetMapping("/reset-password")
     public String resetPasswordPage(@RequestParam String token, Model model, RedirectAttributes redirectAttributes) {
-        System.out.println("=== RESET PASSWORD PAGE ===");
-        System.out.println("Token received: " + token);
+        log.debug("Accessing reset password page with token");
 
         boolean isValid = nnhUserService.validatePasswordResetToken(token);
-        System.out.println("Token valid: " + isValid);
 
         if (!isValid) {
+            log.warn("Invalid or expired password reset token");
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Link reset mật khẩu không hợp lệ hoặc đã hết hạn!");
             return "redirect:/login";
         }
 
         model.addAttribute("token", token);
-        System.out.println("Returning reset-password page");
+        log.debug("Displaying reset password page");
         return "auth/reset-password";
     }
 

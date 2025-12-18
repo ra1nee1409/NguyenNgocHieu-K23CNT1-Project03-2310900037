@@ -55,7 +55,8 @@ public class SecurityConfig {
                 // Configure authorization
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - accessible without login
-                        .requestMatchers("/", "/home", "/register", "/login", "/forgot-password", "/reset-password",
+                        .requestMatchers("/", "/home", "/about", "/register", "/login", "/forgot-password",
+                                "/reset-password",
                                 "/css/**", "/js/**", "/images/**", "/nnhProducts/**", "/product/**")
                         .permitAll()
                         // Admin endpoints - chỉ ADMIN

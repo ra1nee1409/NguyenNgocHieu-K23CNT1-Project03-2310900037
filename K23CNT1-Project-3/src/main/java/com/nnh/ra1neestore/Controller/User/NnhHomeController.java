@@ -64,7 +64,7 @@ public class NnhHomeController {
         // Lấy sản phẩm với pagination (16 sản phẩm/trang = 4x4)
         List<NnhProduct> allProducts;
         if (keyword != null && !keyword.trim().isEmpty()) {
-            allProducts = nnhProductService.searchProducts(keyword);
+            allProducts = nnhProductService.searchActiveProducts(keyword);
         } else if (categoryId != null || (minPrice != null && maxPrice != null)) {
             allProducts = nnhProductService.filterProducts(categoryId, minPrice, maxPrice);
         } else {

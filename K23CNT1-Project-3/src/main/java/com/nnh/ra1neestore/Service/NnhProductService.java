@@ -35,9 +35,9 @@ public class NnhProductService {
     }
 
     /**
-     * Tìm kiếm sản phẩm theo từ khóa (tên)
+     * Tìm kiếm sản phẩm active theo từ khóa (cho user)
      */
-    public List<NnhProduct> searchProducts(String keyword) {
+    public List<NnhProduct> searchActiveProducts(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getActiveProducts();
         }
@@ -51,19 +51,19 @@ public class NnhProductService {
         // Nếu có cả category và price range
         if (categoryId != null && minPrice != null && maxPrice != null) {
             return nnhProductRepository.findByNnhCategoryIdAndPriceBetweenAndIsActiveTrue(
-                categoryId, minPrice, maxPrice);
+                    categoryId, minPrice, maxPrice);
         }
-        
+
         // Chỉ có category
         if (categoryId != null) {
             return nnhProductRepository.findByNnhCategoryIdAndIsActiveTrue(categoryId);
         }
-        
+
         // Chỉ có price range
         if (minPrice != null && maxPrice != null) {
             return nnhProductRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice);
         }
-        
+
         // Không có filter nào
         return getActiveProducts();
     }
@@ -80,18 +80,18 @@ public class NnhProductService {
      */
     public NnhProduct updateProduct(Long id, NnhProduct nnhProduct) {
         return nnhProductRepository.findById(id)
-            .map(existing -> {
-                existing.setName(nnhProduct.getName());
-                existing.setDescription(nnhProduct.getDescription());
-                existing.setPrice(nnhProduct.getPrice());
-                existing.setSalePrice(nnhProduct.getSalePrice());
-                existing.setNnhCategory(nnhProduct.getNnhCategory());
-                existing.setImageUrl(nnhProduct.getImageUrl());
-                existing.setStockQuantity(nnhProduct.getStockQuantity());
-                existing.setIsActive(nnhProduct.getIsActive());
-                return nnhProductRepository.save(existing);
-            })
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .map(existing -> {
+                    existing.setName(nnhProduct.getName());
+                    existing.setDescription(nnhProduct.getDescription());
+                    existing.setPrice(nnhProduct.getPrice());
+                    existing.setSalePrice(nnhProduct.getSalePrice());
+                    existing.setNnhCategory(nnhProduct.getNnhCategory());
+                    existing.setImageUrl(nnhProduct.getImageUrl());
+                    existing.setStockQuantity(nnhProduct.getStockQuantity());
+                    existing.setIsActive(nnhProduct.getIsActive());
+                    return nnhProductRepository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
 
     /**
@@ -111,7 +111,7 @@ public class NnhProductService {
     /**
      * Tìm kiếm sản phẩm cho admin (bao gồm inactive)
      */
-    public List<NnhProduct> searchProducts(String keyword, Long categoryId) {
+    public List<NnhProduct> searchAllProducts(String keyword, Long categoryId) {
         if (keyword != null && !keyword.trim().isEmpty() && categoryId != null) {
             return nnhProductRepository.findByNameContainingIgnoreCaseAndNnhCategoryId(keyword, categoryId);
         } else if (keyword != null && !keyword.trim().isEmpty()) {

@@ -7,6 +7,7 @@ import com.nnh.ra1neestore.Entity.NnhUser;
 import com.nnh.ra1neestore.Repository.NnhPasswordResetTokenRepository;
 import com.nnh.ra1neestore.Repository.NnhUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NnhUserService {
 
     private final NnhUserRepository nnhUserRepository;
@@ -78,33 +80,26 @@ public class NnhUserService {
     }
 
     public boolean validatePasswordResetToken(String token) {
-        System.out.println("=== VALIDATING TOKEN ===");
-        System.out.println("Token to validate: " + token);
+        log.debug("Validating password reset token");
 
         NnhPasswordResetToken resetToken = tokenRepository.findByToken(token).orElse(null);
-        System.out.println("Token found in DB: " + (resetToken != null));
 
         if (resetToken == null) {
-            System.out.println("Validation failed: Token not found");
+            log.warn("Password reset token not found: {}", token);
             return false;
         }
 
-        System.out.println("Token used: " + resetToken.getUsed());
-        System.out.println("Token expiry: " + resetToken.getExpiryDate());
-        System.out.println("Current time: " + java.time.LocalDateTime.now());
-        System.out.println("Is expired: " + resetToken.isExpired());
-
         if (resetToken.getUsed()) {
-            System.out.println("Validation failed: Token already used");
+            log.warn("Password reset token already used: {}", token);
             return false;
         }
 
         if (resetToken.isExpired()) {
-            System.out.println("Validation failed: Token expired");
+            log.warn("Password reset token expired: {}", token);
             return false;
         }
 
-        System.out.println("Validation SUCCESS");
+        log.info("Password reset token validated successfully");
         return true;
     }
 
