@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -66,21 +67,41 @@ public class NnhAdminController {
     // ==================== PRODUCT MANAGEMENT ====================
 
     /**
-     * Danh sách sản phẩm
+     * Danh sách sản phẩm với phân trang
      */
     @GetMapping("/nnhProducts")
     public String listProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
             Model model) {
-        
+
         var products = nnhProductService.searchProducts(keyword, categoryId);
         var categories = nnhCategoryRepository.findAll();
 
-        model.addAttribute("nnhProducts", products);
+        // Pagination logic
+        int pageSize = 10;
+        int totalProducts = products.size();
+        int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
+
+        // Ensure page is within bounds
+        if (page < 0)
+            page = 0;
+        if (page >= totalPages && totalPages > 0)
+            page = totalPages - 1;
+
+        // Get products for current page
+        int startIndex = page * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalProducts);
+        List<NnhProduct> pagedProducts = products.subList(startIndex, endIndex);
+
+        model.addAttribute("nnhProducts", pagedProducts);
         model.addAttribute("categories", categories);
         model.addAttribute("keyword", keyword);
         model.addAttribute("categoryId", categoryId);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalProducts", totalProducts);
 
         return "admin/products/index";
     }
@@ -103,7 +124,7 @@ public class NnhAdminController {
             @ModelAttribute NnhProduct nnhProduct,
             @RequestParam("imageFile") MultipartFile imageFile,
             RedirectAttributes redirectAttributes) {
-        
+
         try {
             // Upload ảnh nếu có
             if (!imageFile.isEmpty()) {
@@ -113,7 +134,7 @@ public class NnhAdminController {
 
             nnhProductService.createProduct(nnhProduct);
             redirectAttributes.addFlashAttribute("success", "Thêm sản phẩm thành công!");
-            
+
         } catch (Exception e) {
             log.error("Error adding product", e);
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
@@ -128,15 +149,15 @@ public class NnhAdminController {
     @GetMapping("/nnhProducts/edit/{id}")
     public String showEditProductForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return nnhProductService.getProductById(id)
-            .map(product -> {
-                model.addAttribute("nnhProduct", product);
-                model.addAttribute("categories", nnhCategoryRepository.findAll());
-                return "admin/products/edit";
-            })
-            .orElseGet(() -> {
-                redirectAttributes.addFlashAttribute("error", "Không tìm thấy sản phẩm!");
-                return "redirect:/admin/nnhProducts";
-            });
+                .map(product -> {
+                    model.addAttribute("nnhProduct", product);
+                    model.addAttribute("categories", nnhCategoryRepository.findAll());
+                    return "admin/products/edit";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("error", "Không tìm thấy sản phẩm!");
+                    return "redirect:/admin/nnhProducts";
+                });
     }
 
     /**
@@ -148,10 +169,10 @@ public class NnhAdminController {
             @ModelAttribute NnhProduct nnhProduct,
             @RequestParam("imageFile") MultipartFile imageFile,
             RedirectAttributes redirectAttributes) {
-        
+
         try {
             var existingProduct = nnhProductService.getProductById(id)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+                    .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
 
             // Upload ảnh mới nếu có
             if (!imageFile.isEmpty()) {
@@ -159,7 +180,7 @@ public class NnhAdminController {
                 if (existingProduct.getImageUrl() != null) {
                     deleteImage(existingProduct.getImageUrl());
                 }
-                
+
                 String imageUrl = saveImage(imageFile, nnhProduct.getNnhCategory().getId());
                 nnhProduct.setImageUrl(imageUrl);
             } else {
@@ -169,7 +190,7 @@ public class NnhAdminController {
 
             nnhProductService.updateProduct(id, nnhProduct);
             redirectAttributes.addFlashAttribute("success", "Cập nhật sản phẩm thành công!");
-            
+
         } catch (Exception e) {
             log.error("Error updating product", e);
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
@@ -185,7 +206,7 @@ public class NnhAdminController {
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             var product = nnhProductService.getProductById(id)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+                    .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
 
             // Xóa ảnh
             if (product.getImageUrl() != null) {
@@ -194,7 +215,7 @@ public class NnhAdminController {
 
             nnhProductService.deleteProduct(id);
             redirectAttributes.addFlashAttribute("success", "Xóa sản phẩm thành công!");
-            
+
         } catch (Exception e) {
             log.error("Error deleting product", e);
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
@@ -211,11 +232,12 @@ public class NnhAdminController {
     private String saveImage(MultipartFile file, Long categoryId) throws IOException {
         // Lấy thông tin category
         var category = nnhCategoryRepository.findById(categoryId)
-            .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
-        
-        // Chuẩn hóa tên folder (loại bỏ dấu, chuyển thành chữ thường, thay khoảng trắng bằng -)
+                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+
+        // Chuẩn hóa tên folder (loại bỏ dấu, chuyển thành chữ thường, thay khoảng trắng
+        // bằng -)
         String categoryFolderName = normalizeFileName(category.getName());
-        
+
         // Tạo tên file unique
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -232,23 +254,24 @@ public class NnhAdminController {
         // Return URL
         return "/images/products/" + categoryFolderName + "/" + filename;
     }
-    
+
     /**
      * Chuẩn hóa tên file/folder (loại bỏ dấu tiếng Việt, chuyển thành chữ thường)
      */
     private String normalizeFileName(String input) {
-        if (input == null) return "";
-        
+        if (input == null)
+            return "";
+
         // Loại bỏ dấu tiếng Việt
         String normalized = java.text.Normalizer.normalize(input, java.text.Normalizer.Form.NFD);
         normalized = normalized.replaceAll("\\p{M}", "");
-        
+
         // Chuyển thành chữ thường, thay khoảng trắng và ký tự đặc biệt bằng -
         normalized = normalized.toLowerCase()
-                              .replaceAll("đ", "d")
-                              .replaceAll("[^a-z0-9]+", "-")
-                              .replaceAll("^-+|-+$", ""); // Loại bỏ - ở đầu/cuối
-        
+                .replaceAll("đ", "d")
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", ""); // Loại bỏ - ở đầu/cuối
+
         return normalized;
     }
 

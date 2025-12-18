@@ -101,4 +101,13 @@ public class NnhHomeController {
 
         return "user/home";
     }
+
+    /**
+     * Hiển thị trang giới thiệu.
+     */
+    @GetMapping("/about")
+    public String about(Model model) {
+        model.addAttribute("pageTitle", "Giới thiệu");
+        return "user/about";
+    }
 }
